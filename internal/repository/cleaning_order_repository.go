@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/StEvseeva/cleany/internal/models"
 )
@@ -10,6 +12,7 @@ import (
 // CleaningOrderRepository defines the interface for cleaning order data operations
 type CleaningOrderRepository interface {
 	Create(ctx context.Context, order *models.CleaningOrder) error
+	CreateMany(ctx context.Context, orders []models.CleaningOrderCreateRequest) ([]int, error)
 	GetByID(ctx context.Context, id int) (*models.CleaningOrder, error)
 	GetAll(ctx context.Context) ([]models.CleaningOrder, error)
 	GetAllByCleanerId(ctx context.Context, id int) ([]models.CleaningOrder, error)
@@ -27,6 +30,61 @@ type cleaningOrderRepository struct {
 // NewCleaningOrderRepository creates a new cleaning order repository
 func NewCleaningOrderRepository(db *sql.DB) CleaningOrderRepository {
 	return &cleaningOrderRepository{db: db}
+}
+
+// Create inserts a new cleaning orders into the database
+func (r *cleaningOrderRepository) CreateMany(ctx context.Context, orders []models.CleaningOrderCreateRequest) ([]int, error) {
+	if len(orders) == 0 {
+		return nil, nil
+	}
+
+	valuesPart := strings.Repeat("($1, $2, $3, $4, $5, $6), ", len(orders))
+	valuesPart = valuesPart[:len(valuesPart)-2]
+
+	// collect a query
+	query := fmt.Sprintf(`
+		INSERT INTO cleaning_orders 
+		(booking_id, cleaning_ts, cleaning_type, cost, done, notes)
+		VALUES %s
+		 RETURNING id`,
+		valuesPart,
+	)
+
+	// make params for query
+	params := make([]interface{}, 0, len(orders)*6)
+	for _, order := range orders {
+		params = append(params,
+			order.BookingId,
+			order.CleaningTs,
+			order.CleaningType,
+			order.Cost,
+			order.Done,
+			order.Notes,
+		)
+	}
+
+	rows, err := r.db.QueryContext(ctx, query, params...)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ids := []int{}
+
+	for rows.Next() {
+		var id int
+		err := rows.Scan(
+			&id,
+		)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+
 }
 
 // Create inserts a new cleaning order into the database

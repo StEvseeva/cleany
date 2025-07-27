@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/StEvseeva/cleany/internal/models"
 	"github.com/StEvseeva/cleany/internal/repository"
@@ -11,6 +12,7 @@ import (
 // CleaningOrderService defines the interface for cleaning order business operations
 type CleaningOrderService interface {
 	CreateCleaningOrder(ctx context.Context, req *models.CleaningOrderCreateRequest) (*models.CleaningOrder, error)
+	CreateCleaningOrdersForBooking(ctx context.Context, booking models.Booking) ([]models.CleaningOrderCreateRequest, error)
 	GetCleaningOrder(ctx context.Context, id int) (*models.CleaningOrder, error)
 	GetAllCleaningOrders(ctx context.Context) ([]models.CleaningOrder, error)
 	GetAllCleaningOrdersByCleanerId(ctx context.Context, cleaner_id int) ([]models.CleaningOrder, error)
@@ -43,7 +45,7 @@ func NewCleaningOrderService(
 // CreateCleaningOrder creates a new cleaning order with validation
 func (s *cleaningOrderService) CreateCleaningOrder(ctx context.Context, req *models.CleaningOrderCreateRequest) (*models.CleaningOrder, error) {
 	// Validate that the booking exists
-	_, err := s.bookingRepo.GetByID(ctx, req.BookingId)
+	booking, err := s.bookingRepo.GetByID(ctx, req.BookingId)
 	if err != nil {
 		return nil, fmt.Errorf("booking not found: %w", err)
 	}
@@ -51,6 +53,9 @@ func (s *cleaningOrderService) CreateCleaningOrder(ctx context.Context, req *mod
 	// Validate cost
 	if req.Cost < 0 {
 		return nil, fmt.Errorf("cost must be non-negative")
+	}
+	if req.Cost == 0 {
+		req.Cost = countOrderCost(*booking, *req.CleaningType)
 	}
 
 	// Create cleaning order
@@ -194,4 +199,62 @@ func (s *cleaningOrderService) RemoveCleaner(ctx context.Context, orderID, clean
 	}
 
 	return nil
+}
+
+func (s *cleaningOrderService) CreateCleaningOrdersForBooking(ctx context.Context, booking models.Booking) ([]models.CleaningOrderCreateRequest, error) {
+	// Validate that the booking exists
+	if _, err := s.bookingRepo.GetByID(ctx, booking.Id); err != nil {
+		return nil, fmt.Errorf("booking not found: %w", err)
+	}
+
+	orders_queue, err := collectOrdersQueue(booking)
+	if err != nil {
+		return nil, fmt.Errorf("failed to collect queue for cleaning orders: %w", err)
+	}
+	_, err = s.cleaningOrderRepo.CreateMany(ctx, orders_queue)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cleaning orders: %w", err)
+	}
+
+	return orders_queue, nil
+}
+
+func collectOrdersQueue(booking models.Booking) ([]models.CleaningOrderCreateRequest, error) {
+
+	baseCleaningTime := 13 * time.Hour
+
+	orders_queue := []models.CleaningOrderCreateRequest{}
+
+	checkInDate := booking.CheckInTs.Truncate(24 * time.Hour)
+	checkOutDate := booking.CheckOutTs.Truncate(24 * time.Hour).Add(-24 * time.Hour)
+
+	for date := checkInDate; date.Before(checkOutDate); date = date.Add(24 * time.Hour) {
+		cleaningType := "periodic"
+		orders_queue = append(orders_queue, models.CleaningOrderCreateRequest{
+			BookingId:    booking.Id,
+			CleaningTs:   date.Add(baseCleaningTime),
+			CleaningType: &cleaningType,
+			Cost:         countOrderCost(booking, cleaningType),
+		})
+	}
+	cleaningType := "general"
+	orders_queue = append(orders_queue, models.CleaningOrderCreateRequest{
+		BookingId:    booking.Id,
+		CleaningTs:   booking.CheckOutTs.Add(1 * time.Hour),
+		CleaningType: &cleaningType,
+		Cost:         countOrderCost(booking, "general"),
+	})
+
+	return orders_queue, nil
+}
+
+// countOrderCost count cost of one order
+// TODO: add internal logic & table "cleaning_type"
+func countOrderCost(booking models.Booking, cleaningType string) int {
+	cost := 100
+	if cleaningType == "general" {
+		cost *= 2
+	}
+	return cost
 }
