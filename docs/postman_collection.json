@@ -1,0 +1,1187 @@
+{
+	"info": {
+		"_postman_id": "cleany-api-collection",
+		"name": "Cleany API - Hotel Cleaning Service",
+		"description": "Complete API collection for testing the Hotel Cleaning Service endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Rooms",
+			"item": [
+				{
+					"name": "Get All Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rooms",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rooms"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Each room has required fields\", function () {",
+									"    const response = pm.response.json();",
+									"    if (response.length > 0) {",
+									"        const room = response[0];",
+									"        pm.expect(room).to.have.property('id');",
+									"        pm.expect(room).to.have.property('floor');",
+									"        pm.expect(room.id).to.be.a('number');",
+									"        pm.expect(room.floor).to.be.a('number');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Room",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"floor\": 2,\n  \"desc\": \"Deluxe room with city view\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/rooms",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rooms"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response is JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Room created with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('id');",
+									"    pm.expect(response).to.have.property('floor');",
+									"    pm.expect(response).to.have.property('desc');",
+									"    pm.expect(response.floor).to.eql(2);",
+									"    pm.expect(response.desc).to.eql(\"Deluxe room with city view\");",
+									"    pm.expect(response.id).to.be.a('number');",
+									"});",
+									"",
+									"// Store the room ID for later use",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set(\"room_id\", response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Room by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rooms/{{room_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rooms",
+								"{{room_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Room has correct ID\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.id).to.eql(parseInt(pm.collectionVariables.get(\"room_id\")));",
+									"});",
+									"",
+									"pm.test(\"Room has required fields\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('floor');",
+									"    pm.expect(response).to.have.property('desc');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Room",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"floor\": 3,\n  \"desc\": \"Updated deluxe room with mountain view\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/rooms/{{room_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rooms",
+								"{{room_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Room updated with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.floor).to.eql(3);",
+									"    pm.expect(response.desc).to.eql(\"Updated deluxe room with mountain view\");",
+									"    pm.expect(response.id).to.eql(parseInt(pm.collectionVariables.get(\"room_id\")));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Room",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rooms/{{room_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rooms",
+								"{{room_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.test(\"Response body is empty\", function () {",
+									"    pm.response.to.not.have.body();",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Cleaners",
+			"item": [
+				{
+					"name": "Get All Cleaners",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cleaners",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaners"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Each cleaner has required fields\", function () {",
+									"    const response = pm.response.json();",
+									"    if (response.length > 0) {",
+									"        const cleaner = response[0];",
+									"        pm.expect(cleaner).to.have.property('id');",
+									"        pm.expect(cleaner).to.have.property('name');",
+									"        pm.expect(cleaner).to.have.property('surname');",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Cleaner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John\",\n  \"surname\": \"Doe\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cleaners",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaners"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Cleaner created with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('id');",
+									"    pm.expect(response).to.have.property('name');",
+									"    pm.expect(response).to.have.property('surname');",
+									"    pm.expect(response.name).to.eql(\"John\");",
+									"    pm.expect(response.surname).to.eql(\"Doe\");",
+									"    pm.expect(response.id).to.be.a('number');",
+									"});",
+									"",
+									"// Store the cleaner ID for later use",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set(\"cleaner_id\", response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Cleaner by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cleaners/{{cleaner_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaners",
+								"{{cleaner_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Cleaner has correct ID\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.id).to.eql(parseInt(pm.collectionVariables.get(\"cleaner_id\")));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Cleaner",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Jane\",\n  \"surname\": \"Smith\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cleaners/{{cleaner_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaners",
+								"{{cleaner_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Cleaner updated with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.name).to.eql(\"Jane\");",
+									"    pm.expect(response.surname).to.eql(\"Smith\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Cleaner",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cleaners/{{cleaner_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaners",
+								"{{cleaner_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"room_id\": {{room_id}},\n  \"check_in_ts\": \"2024-01-15T14:00:00Z\",\n  \"check_out_ts\": \"2024-01-17T11:00:00Z\",\n  \"guests\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/bookings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Booking created with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('id');",
+									"    pm.expect(response).to.have.property('room_id');",
+									"    pm.expect(response).to.have.property('check_in_ts');",
+									"    pm.expect(response).to.have.property('check_out_ts');",
+									"    pm.expect(response).to.have.property('guests');",
+									"    pm.expect(response.room_id).to.eql(parseInt(pm.collectionVariables.get(\"room_id\")));",
+									"    pm.expect(response.guests).to.eql(2);",
+									"});",
+									"",
+									"// Store the booking ID for later use",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set(\"booking_id\", response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Booking by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/{{booking_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"{{booking_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Booking has correct ID\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.id).to.eql(parseInt(pm.collectionVariables.get(\"booking_id\")));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Booking",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"room_id\": {{room_id}},\n  \"check_in_ts\": \"2024-01-15T15:00:00Z\",\n  \"check_out_ts\": \"2024-01-18T11:00:00Z\",\n  \"guests\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/bookings/{{booking_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"{{booking_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Booking updated with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.guests).to.eql(3);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Booking",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bookings/{{booking_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings",
+								"{{booking_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Cleaning Orders",
+			"item": [
+				{
+					"name": "Get All Cleaning Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cleaning_orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaning_orders"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Create Cleaning Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"booking_id\": {{booking_id}},\n  \"cleaning_type\": \"deep_clean\",\n  \"cleaning_ts\": \"2024-01-17T12:00:00Z\",\n  \"notes\": \"Guest requested extra attention to bathroom\",\n  \"cost\": 150,\n  \"done\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cleaning_orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaning_orders"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Cleaning order created with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('id');",
+									"    pm.expect(response).to.have.property('booking_id');",
+									"    pm.expect(response).to.have.property('cost');",
+									"    pm.expect(response.booking_id).to.eql(parseInt(pm.collectionVariables.get(\"booking_id\")));",
+									"    pm.expect(response.cost).to.eql(150);",
+									"    pm.expect(response.done).to.eql(false);",
+									"});",
+									"",
+									"// Store the cleaning order ID for later use",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set(\"cleaning_order_id\", response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Cleaning Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cleaning_orders/{{cleaning_order_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaning_orders",
+								"{{cleaning_order_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Cleaning order has correct ID\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.id).to.eql(parseInt(pm.collectionVariables.get(\"cleaning_order_id\")));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Cleaning Order",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"booking_id\": {{booking_id}},\n  \"cleaning_type\": \"standard_clean\",\n  \"cleaning_ts\": \"2024-01-17T13:00:00Z\",\n  \"notes\": \"Updated cleaning schedule\",\n  \"cost\": 120,\n  \"done\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cleaning_orders/{{cleaning_order_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaning_orders",
+								"{{cleaning_order_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Cleaning order updated with correct data\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.cost).to.eql(120);",
+									"    pm.expect(response.done).to.eql(true);",
+									"    pm.expect(response.cleaning_type).to.eql(\"standard_clean\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Delete Cleaning Order",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cleaning_orders/{{cleaning_order_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaning_orders",
+								"{{cleaning_order_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Assign Cleaner to Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cleaner_id\": {{cleaner_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cleaning_orders/{{cleaning_order_id}}/cleaners",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaning_orders",
+								"{{cleaning_order_id}}",
+								"cleaners"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Cleaner assignment response contains message\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('message');",
+									"    pm.expect(response.message).to.include('cleaner assigned');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Remove Cleaner from Order",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/cleaning_orders/{{cleaning_order_id}}/cleaners/{{cleaner_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaning_orders",
+								"{{cleaning_order_id}}",
+								"cleaners",
+								"{{cleaner_id}}"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Cleaner removal response contains message\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.response.to.be.json;",
+									"    pm.expect(response).to.have.property('message');",
+									"    pm.expect(response.message).to.include('cleaner removed');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Test Scenarios",
+			"item": [
+				{
+					"name": "Complete Workflow Test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rooms",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rooms"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Workflow test - Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Workflow test - Response is valid\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Error Handling - Invalid Room ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/rooms/999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"rooms",
+								"999"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Error handling - Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Error handling - Response contains error message\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('error');",
+									"    pm.expect(response.error).to.include('not found');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Error Handling - Invalid Booking Dates",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"room_id\": 1,\n  \"check_in_ts\": \"2024-01-17T14:00:00Z\",\n  \"check_out_ts\": \"2024-01-15T11:00:00Z\",\n  \"guests\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/bookings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bookings"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Error handling - Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error handling - Response contains validation error\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('error');",
+									"    pm.expect(response.error).to.include('check-in');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Error Handling - Missing Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cleaners",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cleaners"
+							]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Error handling - Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error handling - Response contains validation error\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('error');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "room_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cleaner_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "booking_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cleaning_order_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 
