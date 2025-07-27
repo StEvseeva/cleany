@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+cleany.exe
+
+# Test files
+*_test.go
+*.test
+
+# Documentation
+README.md
+POSTMAN_TESTING_GUIDE.md
+postman_collection.json
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp 
