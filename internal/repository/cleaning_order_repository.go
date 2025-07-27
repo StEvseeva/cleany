@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/StEvseeva/cleany/internal/models"
 )
@@ -10,8 +11,10 @@ import (
 // CleaningOrderRepository defines the interface for cleaning order data operations
 type CleaningOrderRepository interface {
 	Create(ctx context.Context, order *models.CleaningOrder) error
+	CreateMany(ctx context.Context, orders []models.CleaningOrderCreateRequest) ([]int, error)
 	GetByID(ctx context.Context, id int) (*models.CleaningOrder, error)
 	GetAll(ctx context.Context) ([]models.CleaningOrder, error)
+	GetAllByCleanerId(ctx context.Context, id int) ([]models.CleaningOrder, error)
 	Update(ctx context.Context, order *models.CleaningOrder) error
 	Delete(ctx context.Context, id int) error
 	AssignCleaner(ctx context.Context, orderID, cleanerID int) error
@@ -26,6 +29,63 @@ type cleaningOrderRepository struct {
 // NewCleaningOrderRepository creates a new cleaning order repository
 func NewCleaningOrderRepository(db *sql.DB) CleaningOrderRepository {
 	return &cleaningOrderRepository{db: db}
+}
+
+// Create inserts a new cleaning orders into the database
+func (r *cleaningOrderRepository) CreateMany(ctx context.Context, orders []models.CleaningOrderCreateRequest) ([]int, error) {
+	if len(orders) == 0 {
+		return nil, nil
+	}
+
+	// TODO: remove hardcode
+	params_number := 6
+
+	valuesPart := generatePlaceholders(params_number, len(orders)*params_number)
+
+	// collect a query
+	query := fmt.Sprintf(`
+		INSERT INTO cleaning_orders 
+		(booking_id, cleaning_ts, cleaning_type, cost, done, notes)
+		VALUES %s
+		 RETURNING id`,
+		valuesPart,
+	)
+
+	// make params for query
+	params := make([]interface{}, 0, len(orders)*6)
+	for _, order := range orders {
+		params = append(params,
+			order.BookingId,
+			order.CleaningTs,
+			order.CleaningType,
+			order.Cost,
+			order.Done,
+			order.Notes,
+		)
+	}
+
+	rows, err := r.db.QueryContext(ctx, query, params...)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ids := []int{}
+
+	for rows.Next() {
+		var id int
+		err := rows.Scan(
+			&id,
+		)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+
 }
 
 // Create inserts a new cleaning order into the database
@@ -68,6 +128,43 @@ func (r *cleaningOrderRepository) GetByID(ctx context.Context, id int) (*models.
 	}
 
 	return order, nil
+}
+
+// GetByID retrieves a cleaning order by its ID
+func (r *cleaningOrderRepository) GetAllByCleanerId(ctx context.Context, cleaner_id int) ([]models.CleaningOrder, error) {
+	query := `
+		SELECT cleaning_orders.id, cleaning_orders.booking_id, cleaning_orders.cleaning_ts, cleaning_orders.cleaning_type, 
+		cleaning_orders.cost, cleaning_orders.done, cleaning_orders.notes
+		FROM cleaning_orders
+		JOIN cleaner_orders ON cleaning_orders.id = cleaner_orders.order_id
+		WHERE cleaner_orders.cleaner_id = $1
+		ORDER BY cleaning_orders.cleaning_ts`
+
+	rows, err := r.db.QueryContext(ctx, query, cleaner_id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	orders := []models.CleaningOrder{}
+	for rows.Next() {
+		var order models.CleaningOrder
+		err := rows.Scan(
+			&order.Id,
+			&order.BookingId,
+			&order.CleaningTs,
+			&order.CleaningType,
+			&order.Cost,
+			&order.Done,
+			&order.Notes,
+		)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, order)
+	}
+
+	return orders, nil
 }
 
 // GetAll retrieves all cleaning orders

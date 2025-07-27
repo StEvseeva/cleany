@@ -13,7 +13,6 @@ import (
 	"github.com/StEvseeva/cleany/internal/service"
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
-	middleware "github.com/oapi-codegen/echo-middleware"
 )
 
 func main() {
@@ -46,13 +45,10 @@ func main() {
 	cleaningOrderRepo := repository.NewCleaningOrderRepository(database.GetDB())
 
 	// Initialize services
-	bookingService := service.NewBookingService(bookingRepo, roomRepo)
-	cleanerService := service.NewCleanerService(cleanerRepo)
-	roomService := service.NewRoomService(roomRepo)
-	cleaningOrderService := service.NewCleaningOrderService(cleaningOrderRepo, bookingRepo, cleanerRepo)
+	service := service.NewService(cleanerRepo, bookingRepo, roomRepo, cleaningOrderRepo)
 
 	// Create an instance of our handler which satisfies the generated interface
-	api := server.NewServer(bookingService, cleanerService, roomService, cleaningOrderService)
+	api := server.NewServer(service)
 
 	// This is how you set up a basic Echo router
 	e := echo.New()
@@ -60,7 +56,7 @@ func main() {
 	e.Use(echomiddleware.Logger())
 	// Use our validation middleware to check all requests against the
 	// OpenAPI schema.
-	e.Use(middleware.OapiRequestValidator(swagger))
+	// e.Use(middleware.OapiRequestValidator(swagger))
 
 	// We now register our petStore above as the handler for the interface
 	server.RegisterHandlers(e, api)

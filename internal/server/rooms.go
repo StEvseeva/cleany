@@ -9,7 +9,7 @@ import (
 
 // GetRooms returns all rooms
 func (s *Server) GetRooms(ctx echo.Context) error {
-	rooms, err := s.roomService.GetAllRooms(ctx.Request().Context())
+	rooms, err := s.service.GetAllRooms(ctx.Request().Context())
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -23,7 +23,7 @@ func (s *Server) PostRooms(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	room, err := s.roomService.CreateRoom(ctx.Request().Context(), &req)
+	room, err := s.service.CreateRoom(ctx.Request().Context(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
@@ -33,7 +33,7 @@ func (s *Server) PostRooms(ctx echo.Context) error {
 
 // DeleteRoomsId deletes a room by ID
 func (s *Server) DeleteRoomsId(ctx echo.Context, id int) error {
-	err := s.roomService.DeleteRoom(ctx.Request().Context(), id)
+	err := s.service.DeleteRoom(ctx.Request().Context(), id)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -43,7 +43,7 @@ func (s *Server) DeleteRoomsId(ctx echo.Context, id int) error {
 
 // GetRoomsId returns a room by ID
 func (s *Server) GetRoomsId(ctx echo.Context, id int) error {
-	room, err := s.roomService.GetRoom(ctx.Request().Context(), id)
+	room, err := s.service.GetRoom(ctx.Request().Context(), id)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -58,7 +58,7 @@ func (s *Server) PutRoomsId(ctx echo.Context, id int) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	room, err := s.roomService.UpdateRoom(ctx.Request().Context(), id, &req)
+	room, err := s.service.UpdateRoom(ctx.Request().Context(), id, &req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}

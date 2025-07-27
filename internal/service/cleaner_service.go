@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/StEvseeva/cleany/internal/models"
-	"github.com/StEvseeva/cleany/internal/repository"
 )
 
 // CleanerService defines the interface for cleaner business operations
@@ -15,18 +14,6 @@ type CleanerService interface {
 	GetAllCleaners(ctx context.Context) ([]models.Cleaner, error)
 	UpdateCleaner(ctx context.Context, id int, req *models.CleanerUpdateRequest) (*models.Cleaner, error)
 	DeleteCleaner(ctx context.Context, id int) error
-}
-
-// cleanerService implements CleanerService
-type cleanerService struct {
-	cleanerRepo repository.CleanerRepository
-}
-
-// NewCleanerService creates a new cleaner service
-func NewCleanerService(cleanerRepo repository.CleanerRepository) CleanerService {
-	return &cleanerService{
-		cleanerRepo: cleanerRepo,
-	}
 }
 
 // CreateCleaner creates a new cleaner with validation
