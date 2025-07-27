@@ -9,7 +9,7 @@ import (
 
 // GetBookings returns all bookings
 func (s *Server) GetBookings(ctx echo.Context) error {
-	bookings, err := s.bookingService.GetAllBookings(ctx.Request().Context())
+	bookings, err := s.service.GetAllBookings(ctx.Request().Context())
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -23,7 +23,7 @@ func (s *Server) PostBookings(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	booking, err := s.bookingService.CreateBooking(ctx.Request().Context(), &req)
+	booking, err := s.service.CreateBooking(ctx.Request().Context(), &req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
@@ -33,7 +33,7 @@ func (s *Server) PostBookings(ctx echo.Context) error {
 
 // DeleteBookingsId deletes a booking by ID
 func (s *Server) DeleteBookingsId(ctx echo.Context, id int) error {
-	err := s.bookingService.DeleteBooking(ctx.Request().Context(), id)
+	err := s.service.DeleteBooking(ctx.Request().Context(), id)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -43,7 +43,7 @@ func (s *Server) DeleteBookingsId(ctx echo.Context, id int) error {
 
 // GetBookingsId returns a booking by ID
 func (s *Server) GetBookingsId(ctx echo.Context, id int) error {
-	booking, err := s.bookingService.GetBooking(ctx.Request().Context(), id)
+	booking, err := s.service.GetBooking(ctx.Request().Context(), id)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -58,7 +58,7 @@ func (s *Server) PutBookingsId(ctx echo.Context, id int) error {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	booking, err := s.bookingService.UpdateBooking(ctx.Request().Context(), id, &req)
+	booking, err := s.service.UpdateBooking(ctx.Request().Context(), id, &req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}

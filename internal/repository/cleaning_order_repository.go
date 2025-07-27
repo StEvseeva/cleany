@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/StEvseeva/cleany/internal/models"
 )
@@ -38,8 +37,10 @@ func (r *cleaningOrderRepository) CreateMany(ctx context.Context, orders []model
 		return nil, nil
 	}
 
-	valuesPart := strings.Repeat("($1, $2, $3, $4, $5, $6), ", len(orders))
-	valuesPart = valuesPart[:len(valuesPart)-2]
+	// TODO: remove hardcode
+	params_number := 6
+
+	valuesPart := generatePlaceholders(params_number, len(orders)*params_number)
 
 	// collect a query
 	query := fmt.Sprintf(`

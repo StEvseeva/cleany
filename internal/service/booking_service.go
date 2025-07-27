@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/StEvseeva/cleany/internal/models"
-	"github.com/StEvseeva/cleany/internal/repository"
 )
 
 // BookingService defines the interface for booking business operations
@@ -15,20 +14,6 @@ type BookingService interface {
 	GetAllBookings(ctx context.Context) ([]models.Booking, error)
 	UpdateBooking(ctx context.Context, id int, req *models.BookingUpdateRequest) (*models.Booking, error)
 	DeleteBooking(ctx context.Context, id int) error
-}
-
-// bookingService implements BookingService
-type bookingService struct {
-	bookingRepo repository.BookingRepository
-	roomRepo    repository.RoomRepository
-}
-
-// NewBookingService creates a new booking service
-func NewBookingService(bookingRepo repository.BookingRepository, roomRepo repository.RoomRepository) BookingService {
-	return &bookingService{
-		bookingRepo: bookingRepo,
-		roomRepo:    roomRepo,
-	}
 }
 
 // CreateBooking creates a new booking with validation
@@ -55,6 +40,11 @@ func (s *bookingService) CreateBooking(ctx context.Context, req *models.BookingC
 	err = s.bookingRepo.Create(ctx, booking)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create booking: %w", err)
+	}
+
+	_, err = s.cleaningOrderService.CreateCleaningOrdersForBooking(ctx, *booking)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cleaning orders for booking: %w", err)
 	}
 
 	return booking, nil

@@ -45,13 +45,10 @@ func main() {
 	cleaningOrderRepo := repository.NewCleaningOrderRepository(database.GetDB())
 
 	// Initialize services
-	bookingService := service.NewBookingService(bookingRepo, roomRepo)
-	cleanerService := service.NewCleanerService(cleanerRepo)
-	roomService := service.NewRoomService(roomRepo)
-	cleaningOrderService := service.NewCleaningOrderService(cleaningOrderRepo, bookingRepo, cleanerRepo)
+	service := service.NewService(cleanerRepo, bookingRepo, roomRepo, cleaningOrderRepo)
 
 	// Create an instance of our handler which satisfies the generated interface
-	api := server.NewServer(bookingService, cleanerService, roomService, cleaningOrderService)
+	api := server.NewServer(service)
 
 	// This is how you set up a basic Echo router
 	e := echo.New()

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/StEvseeva/cleany/internal/models"
-	"github.com/StEvseeva/cleany/internal/repository"
 )
 
 // RoomService defines the interface for room business operations
@@ -15,18 +14,6 @@ type RoomService interface {
 	GetAllRooms(ctx context.Context) ([]models.Room, error)
 	UpdateRoom(ctx context.Context, id int, req *models.RoomUpdateRequest) (*models.Room, error)
 	DeleteRoom(ctx context.Context, id int) error
-}
-
-// roomService implements RoomService
-type roomService struct {
-	roomRepo repository.RoomRepository
-}
-
-// NewRoomService creates a new room service
-func NewRoomService(roomRepo repository.RoomRepository) RoomService {
-	return &roomService{
-		roomRepo: roomRepo,
-	}
 }
 
 // CreateRoom creates a new room with validation

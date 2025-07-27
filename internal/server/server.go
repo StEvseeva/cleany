@@ -5,22 +5,11 @@ import (
 )
 
 type Server struct {
-	bookingService       service.BookingService
-	cleanerService       service.CleanerService
-	roomService          service.RoomService
-	cleaningOrderService service.CleaningOrderService
+	service service.Service
 }
 
-func NewServer(
-	bookingService service.BookingService,
-	cleanerService service.CleanerService,
-	roomService service.RoomService,
-	cleaningOrderService service.CleaningOrderService,
-) *Server {
+func NewServer(service service.Service) *Server {
 	return &Server{
-		bookingService:       bookingService,
-		cleanerService:       cleanerService,
-		roomService:          roomService,
-		cleaningOrderService: cleaningOrderService,
+		service: service,
 	}
 }

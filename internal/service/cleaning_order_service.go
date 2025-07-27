@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/StEvseeva/cleany/internal/models"
-	"github.com/StEvseeva/cleany/internal/repository"
 )
 
 // CleaningOrderService defines the interface for cleaning order business operations
@@ -20,26 +19,6 @@ type CleaningOrderService interface {
 	DeleteCleaningOrder(ctx context.Context, id int) error
 	AssignCleaner(ctx context.Context, orderID int, req *models.CleanerOrderCreateRequest) error
 	RemoveCleaner(ctx context.Context, orderID, cleanerID int) error
-}
-
-// cleaningOrderService implements CleaningOrderService
-type cleaningOrderService struct {
-	cleaningOrderRepo repository.CleaningOrderRepository
-	bookingRepo       repository.BookingRepository
-	cleanerRepo       repository.CleanerRepository
-}
-
-// NewCleaningOrderService creates a new cleaning order service
-func NewCleaningOrderService(
-	cleaningOrderRepo repository.CleaningOrderRepository,
-	bookingRepo repository.BookingRepository,
-	cleanerRepo repository.CleanerRepository,
-) CleaningOrderService {
-	return &cleaningOrderService{
-		cleaningOrderRepo: cleaningOrderRepo,
-		bookingRepo:       bookingRepo,
-		cleanerRepo:       cleanerRepo,
-	}
 }
 
 // CreateCleaningOrder creates a new cleaning order with validation
