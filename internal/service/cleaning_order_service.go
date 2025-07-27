@@ -13,6 +13,7 @@ type CleaningOrderService interface {
 	CreateCleaningOrder(ctx context.Context, req *models.CleaningOrderCreateRequest) (*models.CleaningOrder, error)
 	GetCleaningOrder(ctx context.Context, id int) (*models.CleaningOrder, error)
 	GetAllCleaningOrders(ctx context.Context) ([]models.CleaningOrder, error)
+	GetAllCleaningOrdersByCleanerId(ctx context.Context, cleaner_id int) ([]models.CleaningOrder, error)
 	UpdateCleaningOrder(ctx context.Context, id int, req *models.CleaningOrderUpdateRequest) (*models.CleaningOrder, error)
 	DeleteCleaningOrder(ctx context.Context, id int) error
 	AssignCleaner(ctx context.Context, orderID int, req *models.CleanerOrderCreateRequest) error
@@ -83,6 +84,16 @@ func (s *cleaningOrderService) GetCleaningOrder(ctx context.Context, id int) (*m
 // GetAllCleaningOrders retrieves all cleaning orders
 func (s *cleaningOrderService) GetAllCleaningOrders(ctx context.Context) ([]models.CleaningOrder, error) {
 	orders, err := s.cleaningOrderRepo.GetAll(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cleaning orders: %w", err)
+	}
+
+	return orders, nil
+}
+
+// GetAllCleaningOrders retrieves all cleaning orders assigned to a cleaner
+func (s *cleaningOrderService) GetAllCleaningOrdersByCleanerId(ctx context.Context, cleaner_id int) ([]models.CleaningOrder, error) {
+	orders, err := s.cleaningOrderRepo.GetAllByCleanerId(ctx, cleaner_id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cleaning orders: %w", err)
 	}

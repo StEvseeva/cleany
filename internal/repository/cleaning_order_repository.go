@@ -12,6 +12,7 @@ type CleaningOrderRepository interface {
 	Create(ctx context.Context, order *models.CleaningOrder) error
 	GetByID(ctx context.Context, id int) (*models.CleaningOrder, error)
 	GetAll(ctx context.Context) ([]models.CleaningOrder, error)
+	GetAllByCleanerId(ctx context.Context, id int) ([]models.CleaningOrder, error)
 	Update(ctx context.Context, order *models.CleaningOrder) error
 	Delete(ctx context.Context, id int) error
 	AssignCleaner(ctx context.Context, orderID, cleanerID int) error
@@ -68,6 +69,43 @@ func (r *cleaningOrderRepository) GetByID(ctx context.Context, id int) (*models.
 	}
 
 	return order, nil
+}
+
+// GetByID retrieves a cleaning order by its ID
+func (r *cleaningOrderRepository) GetAllByCleanerId(ctx context.Context, cleaner_id int) ([]models.CleaningOrder, error) {
+	query := `
+		SELECT cleaning_orders.id, cleaning_orders.booking_id, cleaning_orders.cleaning_ts, cleaning_orders.cleaning_type, 
+		cleaning_orders.cost, cleaning_orders.done, cleaning_orders.notes
+		FROM cleaning_orders
+		JOIN cleaner_orders ON cleaning_orders.id = cleaner_orders.order_id
+		WHERE cleaner_orders.cleaner_id = $1
+		ORDER BY cleaning_orders.cleaning_ts`
+
+	rows, err := r.db.QueryContext(ctx, query, cleaner_id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	orders := []models.CleaningOrder{}
+	for rows.Next() {
+		var order models.CleaningOrder
+		err := rows.Scan(
+			&order.Id,
+			&order.BookingId,
+			&order.CleaningTs,
+			&order.CleaningType,
+			&order.Cost,
+			&order.Done,
+			&order.Notes,
+		)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, order)
+	}
+
+	return orders, nil
 }
 
 // GetAll retrieves all cleaning orders

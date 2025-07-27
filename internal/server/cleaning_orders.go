@@ -90,3 +90,12 @@ func (s *Server) DeleteCleaningOrdersIdCleanersCleanerId(ctx echo.Context, id in
 
 	return ctx.JSON(http.StatusOK, map[string]string{"message": "cleaner removed"})
 }
+
+// PutCleanersId updates a cleaner by ID
+func (s *Server) GetCleanersIdCleaningOrders(ctx echo.Context, id int) error {
+	orders, err := s.cleaningOrderService.GetAllCleaningOrdersByCleanerId(ctx.Request().Context(), id)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return ctx.JSON(http.StatusOK, orders)
+}

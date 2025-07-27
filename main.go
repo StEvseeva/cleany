@@ -13,7 +13,6 @@ import (
 	"github.com/StEvseeva/cleany/internal/service"
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
-	middleware "github.com/oapi-codegen/echo-middleware"
 )
 
 func main() {
@@ -60,7 +59,7 @@ func main() {
 	e.Use(echomiddleware.Logger())
 	// Use our validation middleware to check all requests against the
 	// OpenAPI schema.
-	e.Use(middleware.OapiRequestValidator(swagger))
+	// e.Use(middleware.OapiRequestValidator(swagger))
 
 	// We now register our petStore above as the handler for the interface
 	server.RegisterHandlers(e, api)
