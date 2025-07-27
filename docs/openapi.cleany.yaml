@@ -1,0 +1,558 @@
+openapi: 3.0.0
+info:
+  title: Hotel Cleaning Service API
+  version: 1.0.0
+  description: API for managing hotel cleaning operations
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /rooms:
+    get:
+      summary: List all rooms
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+    post:
+      summary: Create a new room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreateRequest'
+      responses:
+        '201':
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+
+  /rooms/{id}:
+    get:
+      summary: Get room by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Room data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+    put:
+      summary: Update room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomUpdateRequest'
+      responses:
+        '200':
+          description: Updated room data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+    delete:
+      summary: Delete room
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Room deleted
+
+  /cleaners:
+    get:
+      summary: List all cleaners
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cleaner'
+    post:
+      summary: Create a new cleaner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanerCreateRequest'
+      responses:
+        '201':
+          description: Cleaner created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cleaner'
+
+  /cleaners/{id}:
+    get:
+      summary: Get cleaner by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cleaner data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cleaner'
+    put:
+      summary: Update cleaner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanerUpdateRequest'
+      responses:
+        '200':
+          description: Updated cleaner data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cleaner'
+    delete:
+      summary: Delete cleaner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Cleaner deleted
+
+  /cleaners/{id}/cleaning_orders:
+    get:
+      summary: Get all cleaning orders by cleaner ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CleaningOrder'
+
+  /bookings:
+    get:
+      summary: List all bookings
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+    post:
+      summary: Create a new booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreateRequest'
+      responses:
+        '201':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+
+  /bookings/{id}:
+    get:
+      summary: Get booking by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+    put:
+      summary: Update booking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdateRequest'
+      responses:
+        '200':
+          description: Updated booking data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+    delete:
+      summary: Delete booking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Booking deleted
+
+  /cleaning_orders:
+    get:
+      summary: List all cleaning orders
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CleaningOrder'
+    post:
+      summary: Create a new cleaning order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleaningOrderCreateRequest'
+      responses:
+        '201':
+          description: Cleaning order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleaningOrder'
+
+  /cleaning_orders/{id}:
+    get:
+      summary: Get cleaning order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cleaning order data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleaningOrder'
+    put:
+      summary: Update cleaning order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleaningOrderUpdateRequest'
+      responses:
+        '200':
+          description: Updated cleaning order data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleaningOrder'
+    delete:
+      summary: Delete cleaning order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Cleaning order deleted
+
+  /cleaning_orders/{id}/cleaners:
+    post:
+      summary: Assign cleaner to cleaning order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanerOrderCreateRequest'
+      responses:
+        '201':
+          description: Cleaner assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CleanerOrder'
+
+  /cleaning_orders/{id}/cleaners/{cleanerId}:
+    delete:
+      summary: Remove cleaner from cleaning order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: cleanerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Cleaner removed
+
+components:
+  schemas:
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        floor:
+          type: integer
+        desc:
+          type: string
+      required: [id, floor]
+
+    RoomCreateRequest:
+      type: object
+      properties:
+        floor:
+          type: integer
+        desc:
+          type: string
+      required: [floor]
+
+    RoomUpdateRequest:
+      type: object
+      properties:
+        floor:
+          type: integer
+        desc:
+          type: string
+      required: []
+
+    Cleaner:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+      required: [id, name, surname]
+
+    CleanerCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+      required: [name, surname]
+
+    CleanerUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+      required: []
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        room_id:
+          type: integer
+        check_in_ts:
+          type: string
+          format: date-time
+        check_out_ts:
+          type: string
+          format: date-time
+        guests:
+          type: integer
+      required: [id, room_id]
+
+    BookingCreateRequest:
+      type: object
+      properties:
+        room_id:
+          type: integer
+        check_in_ts:
+          type: string
+          format: date-time
+        check_out_ts:
+          type: string
+          format: date-time
+        guests:
+          type: integer
+      required: [room_id, check_in_ts, check_out_ts]
+
+    BookingUpdateRequest:
+      type: object
+      properties:
+        room_id:
+          type: integer
+        check_in_ts:
+          type: string
+          format: date-time
+        check_out_ts:
+          type: string
+          format: date-time
+        guests:
+          type: integer
+      required: [room_id, check_in_ts, check_out_ts]
+
+    CleaningOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+        booking_id:
+          type: integer
+        cleaning_type:
+          type: string
+        cleaning_ts:
+          type: string
+          format: date-time
+        notes:
+          type: string
+        cost:
+          type: integer
+        done:
+          type: boolean
+      required: [id, booking_id, cost]
+
+    CleaningOrderCreateRequest:
+      type: object
+      properties:
+        booking_id:
+          type: integer
+        cleaning_type:
+          type: string
+        cleaning_ts:
+          type: string
+          format: date-time
+        notes:
+          type: string
+        cost:
+          type: integer
+        done:
+          type: boolean
+      required: [booking_id, cost, cleaning_ts]
+
+    CleaningOrderUpdateRequest:
+      type: object
+      properties:
+        booking_id:
+          type: integer
+        cleaning_type:
+          type: string
+        cleaning_ts:
+          type: string
+          format: date-time
+        notes:
+          type: string
+        cost:
+          type: integer
+        done:
+          type: boolean
+      required: [booking_id, cost, cleaning_ts]
+
+    CleanerOrderCreateRequest:
+      type: object
+      properties:
+        cleaner_id:
+          type: integer
+      required: [cleaner_id]
+
+    CleanerOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+        cleaner_id:
+          type: integer
+        order_id:
+          type: integer
+      required: [id, cleaner_id, order_id]
