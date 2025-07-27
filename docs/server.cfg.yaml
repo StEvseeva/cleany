@@ -1,0 +1,6 @@
+package: server
+output: internal/server/cleany-server1.2.gen.go
+additional-imports:
+generate:
+  echo-server: true
+  embedded-spec: true
